@@ -15,8 +15,12 @@ Federated learning with 2 users compared againts Non-Federated scenario
 ## Results
 
 
-As our second model, we employ a transformer network for the task of preclinical AD detection. Transformer models  have  been  used  for  different  tasks  such  as  human  action recognition from videos (Girdhar et al. 2018) and text translation (Vaswani et al. 2017). Although transformer networks have been used for other tasks and applications, we firmly believe that this is the first work that employs a transformer network on MRI images of brain for preclinical stage Alzheimeir’s disease detection. Slices from a brain scan are fed to the network, and the network is expected to detect whether any sign of dementia is observable or not, even the subject is showing no signs nor symptoms of the disease yet.
-![GitHub Logo](/images/transformer.png)
+Non-Federated Learning
+![GitHub Logo](/images/Accuracy_Scores.png)
+
+
+Federated Learning
+![GitHub Logo](/images/Federated_Accuracy_Scores.png)
+
 
 ## Numerical Comparison
-![GitHub Logo](/images/numerical_comparison.png)
