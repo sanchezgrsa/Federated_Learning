@@ -9,7 +9,7 @@
 Credit Card Fraud Detection (https://www.kaggle.com/mlg-ulb/creditcardfraud/tasks?taskId=77)
 
 ## Models
-Federated model with 2 users compared agains Non-Federated learning 
+Federated learning with 2 users compared againts Non-Federated scenario 
 
 
 ## Results
