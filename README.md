@@ -29,7 +29,7 @@ Federated Learning
 
 Non-Federated Learning Confusion Matrix 
 
-![GitHub Logo](/Images/CF_Non_Federated.png)
+![GitHub Logo](/Images/CF_Non_Federated.png =100x100)
 
 
 Federated Learning Confusion Matrix 
