@@ -27,14 +27,12 @@ Federated Learning
 
 ## Numerical Comparison
 
-Non-Federated Learning Confusion Matrix 
-
+Non-Federated Learning Confusion Matrix, Federated Learning Confusion Matrix 
 
 <p>
 
-<img src="/Images/CF_Non_Federated.png" width="300" height="200">
-<img src="/Images/CM_Federated.png" width="300" height="200">
+<img src="/Images/CF_Non_Federated.png" width="300" height="250">
+<img src="/Images/CM_Federated.png" width="300" height="250">
 </p>
 
-Federated Learning Confusion Matrix 
 
