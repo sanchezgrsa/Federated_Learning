@@ -33,7 +33,7 @@ Federated Learning
 
     * F1 Score = 0.981
     * Test Accuracy = 0.974
-    * 
+    
 * Federated Learning Confusion Matrix 
 
 <img src="/Images/CM_Federated.png" width="300" height="250">
