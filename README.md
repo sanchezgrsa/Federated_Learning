@@ -16,11 +16,11 @@ Federated learning with 2 users compared againts Non-Federated scenario
 
 
 Non-Federated Learning
-![GitHub Logo](/images/Accuracy_Scores.png)
+![GitHub Logo](/Images/Accuracy_Scores.png)
 
 
 Federated Learning
-![GitHub Logo](/images/Federated_Accuracy_Scores.png)
+![GitHub Logo](/Images/Federated_Accuracy_Scores.png)
 
 
 ## Numerical Comparison
