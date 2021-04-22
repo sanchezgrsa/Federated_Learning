@@ -32,8 +32,8 @@ Non-Federated Learning Confusion Matrix
 
 <p>
 
-<img src="/Images/CF_Non_Federated.png" width="300" height="100">
-<img src="/Images/CM_Federated.png" width="300" height="100">
+<img src="/Images/CF_Non_Federated.png" width="300" height="200">
+<img src="/Images/CM_Federated.png" width="300" height="200">
 </p>
 
 Federated Learning Confusion Matrix 
