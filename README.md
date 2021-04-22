@@ -26,3 +26,12 @@ Federated Learning
 
 
 ## Numerical Comparison
+
+Non-Federated Learning Confusion Matrix 
+
+![GitHub Logo](/Images/CF_Non_Federated.png)
+
+
+Federated Learning Confusion Matrix 
+
+![GitHub Logo](/Images/CM_Federated.png)
