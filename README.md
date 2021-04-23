@@ -12,24 +12,11 @@ Credit Card Fraud Detection (https://www.kaggle.com/mlg-ulb/creditcardfraud/task
 Federated learning with 2 users compared againts Non-Federated scenario 
 
 
-## Results
-
-
-Non-Federated Learning
-
-![GitHub Logo](/Images/Accuracy_Scores.png)
-
-
-Federated Learning
-
-![GitHub Logo](/Images/Federated_Accuracy_Scores.png)
-
-
 ## Numerical Comparison
 
 * Non-Federated Learning Confusion Matrix
 
-<img src="/Images/CF_Non_Federated.png" width="300" height="250">
+<img src="/Images/CM_Non_Federated.png" width="300" height="250">
 
     * F1 Score = 0.981
     * Test Accuracy = 0.974
