@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import torch.optim as optim
 from torch.utils.data.dataset import Dataset   
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score,roc_auc_score,f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score, roc_auc_score,f1_score, confusion_matrix
 from torch.utils.data import DataLoader, TensorDataset
 import model as lin_model
-
+from sklearn.utils import resample,shuffle
 ######################## Training Function ########################
 
 def train (model, data_loader, optimizer, epoch,criterion, device, loss_update_interval=1000): 
@@ -23,7 +23,6 @@ def train (model, data_loader, optimizer, epoch,criterion, device, loss_update_i
     for i, (x_cpu, y_cpu) in enumerate(data_loader):
 
             # Run the forward pass
-        
             x, y = x_cpu.to(device), y_cpu.to(device)
             outputs = model(x)
             loss = criterion(outputs, y.long())
@@ -36,7 +35,6 @@ def train (model, data_loader, optimizer, epoch,criterion, device, loss_update_i
             optimizer.step()
 
             # Calculating training accuracy
-            
             _, predicted = torch.max(outputs.data, 1)
             y_original = y.cpu().data.squeeze().numpy()
             y_pred = predicted.cpu().data.squeeze().numpy()
@@ -52,6 +50,7 @@ def train (model, data_loader, optimizer, epoch,criterion, device, loss_update_i
             l.append(loss.item())
 
             training_score.append(training_accuracy)
+
 
     l = np.mean(l)
     training_accuracy = np.mean(training_score)
@@ -75,16 +74,14 @@ def validation(model, data_loader, criterion, epoch, device, test):
                 y = torch.squeeze(y)
                 output = model(X)
                 loss = criterion(output, y.long())
-                val_loss += loss.item()                
+                val_loss += loss.item()                 # sum up batch loss 
+
                 _, y_predicted = torch.max(output, 1)
 
             # collect all y and y_pred in all batches
-            
                 all_y.extend(y)
                 all_y_pred.extend(y_predicted)
-                
     # to compute accuracy
-    
     val_loss /= len(data_loader.dataset)
     all_y = torch.stack(all_y, dim=0)
     all_y_pred = torch.stack(all_y_pred, dim=0)
@@ -93,6 +90,7 @@ def validation(model, data_loader, criterion, epoch, device, test):
     if not test: 
         print("[INFO] Epoch (%s) Validation Summary: "%(epoch), " Validation Accuracy: ", '%.1f' % (test_score*100))  
  
+
     elif test: 
         conf_m = confusion_matrix(all_y.cpu().data.squeeze().numpy(), all_y_pred.cpu().data.squeeze().numpy())
         print("[INFO] Test Summary: Test Accuracy: ", '%.1f' % (test_score*100))
@@ -111,20 +109,26 @@ def validation(model, data_loader, criterion, epoch, device, test):
 def main():
     
     num_classes = 2
-    epochs = 200
+    epochs = 500
     batch_size = 12
+
 
     print("[INFO] Starting ...")
     
     # Detect devices for GPU calculations
-    
     use_cuda = torch.cuda.is_available()                   
     device = torch.device("cuda" if use_cuda else "cpu")   
+
 
 ######################## Reading the data ########################
 
     df = pd.read_csv('creditcard.csv')
     print('This data frame has {} rows and {} columns.'.format(df.shape[0], df.shape[1]))
+
+    # Downsampling the data
+    df_down = resample(df[df['Class']==0], replace=False, n_samples = len(df[df['Class']==1]), random_state = 42)
+    balanced_df = pd.concat([df[df['Class']==1],df_down])
+    df = shuffle(balanced_df)
 
     X = df[['Time', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10',
         'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V17', 'V18', 'V19', 'V20',
@@ -134,12 +138,10 @@ def main():
 ######################## Creating datasets ######################## 
 
     # Dividing the data into Training, Validation and Test sets
-  
     X_train_prev, X_val, y_train_prev, y_val = train_test_split(X, y, test_size=0.20, random_state=42)
     X_train, X_test , y_train, y_test = train_test_split(X_train_prev, y_train_prev, test_size=0.15, random_state=42)
 
     # Converting everything to Tensors
-    
     tr_values = np.float32(X_train)  # X_train
     train_labels = np.float32(y_train)   # Y_train
 
@@ -173,11 +175,8 @@ def main():
             for item in labels: 
                 index = int(item[1].item())
                 count[index] += 1
-                print(count, end="\r")
             weight_per_class = [0.] * nclasses                                      
             N = float(sum(count))  
-            print("")
-
             for i in range(nclasses):                                                   
                 weight_per_class[i] = N/float(count[i])
 
@@ -186,7 +185,6 @@ def main():
             for idx, val in enumerate(labels):      
                 index = int(val[1].item())                              
                 weight[idx] = weight_per_class[index] 
-                print(weight[idx], end="\r")
             return weight 
 
     w = weights_balanced(train_dataset, num_classes)     
@@ -194,7 +192,6 @@ def main():
     samp = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights),replacement=True)    
 
     # Parameters configuration for training, validation, and test sets 
-    
     params_train = {'batch_size': batch_size, 'shuffle': False, 'num_workers': 4, 'pin_memory': True,'sampler' : samp, "drop_last":True} if use_cuda else {}
     params_val =  {'batch_size': batch_size, 'shuffle': False, 'num_workers': 4, 'pin_memory': True, "drop_last":True} if use_cuda else {}    
 
@@ -205,18 +202,14 @@ def main():
     print("[INFO] Data is loaded. ")
    
    # Defining loss function, model, and optimizer 
-    
     criterion = nn.CrossEntropyLoss()
     model = lin_model.LinNet().cuda()
-    optimizer = optim.Adam(model.parameters(), lr=0.00001)
-    
+    optimizer = optim.Adam(model.parameters(), lr=0.0001)
     # record training process
-    
     epoch_train_losses = []
     epoch_train_scores = []
     epoch_test_losses = []
     epoch_test_scores = []
-    
 ########################  Training Process ########################
 
     for epoch in range(epochs):
@@ -227,14 +220,12 @@ def main():
             epoch_test_loss, epoch_test_score  = validation(model, validloader, criterion, epoch, device, test = False)
 
         # save results
-        
         epoch_train_losses.append(train_losses)
         epoch_train_scores.append(train_scores)
         epoch_test_losses.append(epoch_test_loss)
         epoch_test_scores.append(epoch_test_score)
 
         # save all train test results
-        
         A = np.array(epoch_train_losses)
         B = np.array(epoch_train_scores)
         C = np.array(epoch_test_losses)
@@ -242,31 +233,32 @@ def main():
 
 
     # Test
-    
     correct = validation(model, testloader, criterion, epoch, device, test=True)
 
     print("[INFO] Training Finished")
 
 ######################## Plotting accuracy results ########################
-
-fig = plt.figure(figsize=(10, 4))
+    # plot
+    fig = plt.figure(figsize=(10, 4))
     plt.subplot(121)
-    plt.plot(np.arange(1, epochs + 1), A) 
-    plt.plot(np.arange(1, epochs + 1), C)       
+    plt.plot(np.arange(1, epochs + 1), A)  # train loss (on epoch end)
+    plt.plot(np.arange(1, epochs + 1), C)         #  test loss (on epoch end)
     plt.title("model loss")
     plt.xlabel('epochs')
     plt.ylabel('loss')
     plt.legend(['train', 'val'], loc="upper left")
     # 2nd figure
     plt.subplot(122)
-    plt.plot(np.arange(1, epochs + 1), B)  
-    plt.plot(np.arange(1, epochs + 1), D)         
+    plt.plot(np.arange(1, epochs + 1), B)  # train accuracy (on epoch end)
+    plt.plot(np.arange(1, epochs + 1), D)         #  test accuracy (on epoch end)
+    # plt.plot(histories.losses_val)
     plt.title("training scores")
     plt.xlabel('epochs')
     plt.ylabel('accuracy')
     plt.legend(['train', 'val'], loc="upper left")
     title ="Accuracy_Scores.png"
     plt.savefig(title, dpi=600)
+    # plt.close(fig)
     plt.show()
 
 if __name__=="__main__": 
