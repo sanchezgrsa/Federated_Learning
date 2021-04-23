@@ -27,7 +27,8 @@ Federated learning with 2 users compared againts Non-Federated scenario
 
 <img src="/Images/CM_Federated.png" width="300" height="250">
 
-    * F1 Score = 0.9953
-    * Test Accuracy = 0.99
-
+    * F1 Score = 0.921
+    * Test Accuracy = 0.916
+    * Sensitivity = 0.854
+    * Specifity = 1
 
