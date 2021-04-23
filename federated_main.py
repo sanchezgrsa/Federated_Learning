@@ -1,6 +1,4 @@
-import os 
 import random
-from tqdm import tqdm
 import numpy as np
 import torch, torchvision
 import torch.nn as nn
@@ -10,9 +8,10 @@ import matplotlib.pyplot as plt
 import torch.optim as optim
 from torch.utils.data.dataset import Dataset   
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, roc_auc_score
-from torch.utils.data import DataLoader, TensorDataset,f1_score, confusion_matrix 
+from sklearn.metrics import accuracy_score, roc_auc_score,f1_score, confusion_matrix
+from torch.utils.data import DataLoader, TensorDataset
 import model as lin_model
+from sklearn.utils import resample,shuffle
 
 ######################## Training Functions ########################
 
@@ -108,7 +107,7 @@ def main():
 
     num_classes = 2
     num_users = 2
-    epochs = 200
+    epochs = 997
     batch_size = 12
 
     print("[INFO] Starting ...")
@@ -121,6 +120,12 @@ def main():
 
     df = pd.read_csv('creditcard.csv')
     print('This data frame has {} rows and {} columns.'.format(df.shape[0], df.shape[1]))
+    
+    # Downsampling the data
+    df_down = resample(df[df['Class']==0], replace=False, n_samples = len(df[df['Class']==1]), random_state = 42)
+    balanced_df = pd.concat([df[df['Class']==1],df_down])
+    df = shuffle(balanced_df)
+
 
     X = df[['Time', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10',
         'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V17', 'V18', 'V19', 'V20',
@@ -180,11 +185,8 @@ def main():
         for item in labels: 
             index = int(item[1].item())
             count[index] += 1
-            print(count, end="\r")
         weight_per_class = [0.] * nclasses                                      
         N = float(sum(count))  
-
-        print("")
         for i in range(nclasses):                                                   
             weight_per_class[i] = N/float(count[i])
         weight = [0] * len(labels)  
@@ -222,7 +224,7 @@ def main():
         model.load_state_dict(centralized_model.state_dict()) 
 
     model = lin_model.LinNet().cuda()
-    optimizer = [optim.Adam(model.parameters(), lr=0.00001) for model in client_models]
+    optimizer = [optim.Adam(model.parameters(), lr=0.0001) for model in client_models]
     criterion =  nn.CrossEntropyLoss()
 
     # record training process
