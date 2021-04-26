@@ -246,7 +246,7 @@ def main():
 
             train_l, train_acc = train_user(client_models[i], optimizer[i], criterion, trainloader[client_idx[i]], device, epoch)
         
-        # server aggregate
+        # Centralized model update
 
         central_server_update(centralized_model, client_models)
         val_l, val_acc = validation(centralized_model, validloader, criterion, device, epoch, test = False)
