@@ -12,16 +12,15 @@ from sklearn.metrics import accuracy_score, roc_auc_score,f1_score, confusion_ma
 from torch.utils.data import DataLoader, TensorDataset
 import model as lin_model
 from sklearn.utils import resample,shuffle
+
 ######################## Training Function ########################
 
 def train (model, data_loader, optimizer, epoch,criterion, device, loss_update_interval=1000): 
-
-    loss_list = []
     training_score = []
     l = []
     model.train()
     for i, (x_cpu, y_cpu) in enumerate(data_loader):
-
+        
             # Run the forward pass
             x, y = x_cpu.to(device), y_cpu.to(device)
             outputs = model(x)
@@ -35,11 +34,11 @@ def train (model, data_loader, optimizer, epoch,criterion, device, loss_update_i
             optimizer.step()
 
             # Calculating training accuracy
+            
             _, predicted = torch.max(outputs.data, 1)
             y_original = y.cpu().data.squeeze().numpy()
             y_pred = predicted.cpu().data.squeeze().numpy()
             training_accuracy = (accuracy_score(y_pred, y_original))*100
-
 
             # Track the accuracy
         
@@ -51,10 +50,8 @@ def train (model, data_loader, optimizer, epoch,criterion, device, loss_update_i
 
             training_score.append(training_accuracy)
 
-
     l = np.mean(l)
     training_accuracy = np.mean(training_score)
-
     print("[INFO] Epoch (%s) Training Summary: "%(epoch), " Loss: %.3f" % (l), " Training Accuracy: %3f" % (training_accuracy))
 
     return l, training_accuracy
@@ -70,18 +67,18 @@ def validation(model, data_loader, criterion, epoch, device, test):
     with torch.no_grad():
         for X_cpu, y_cpu in data_loader:
                 X, y = X_cpu.to(device, dtype=torch.float), y_cpu.to(device, dtype=torch.float)
-                
-                y = torch.squeeze(y)
                 output = model(X)
                 loss = criterion(output, y.long())
-                val_loss += loss.item()                 # sum up batch loss 
-
+                val_loss += loss.item()                  
                 _, y_predicted = torch.max(output, 1)
 
             # collect all y and y_pred in all batches
+            
                 all_y.extend(y)
                 all_y_pred.extend(y_predicted)
+                
     # to compute accuracy
+    
     val_loss /= len(data_loader.dataset)
     all_y = torch.stack(all_y, dim=0)
     all_y_pred = torch.stack(all_y_pred, dim=0)
@@ -89,7 +86,6 @@ def validation(model, data_loader, criterion, epoch, device, test):
 
     if not test: 
         print("[INFO] Epoch (%s) Validation Summary: "%(epoch), " Validation Accuracy: ", '%.1f' % (test_score*100))  
- 
 
     elif test: 
         conf_m = confusion_matrix(all_y.cpu().data.squeeze().numpy(), all_y_pred.cpu().data.squeeze().numpy())
@@ -116,6 +112,7 @@ def main():
     print("[INFO] Starting ...")
     
     # Detect devices for GPU calculations
+    
     use_cuda = torch.cuda.is_available()                   
     device = torch.device("cuda" if use_cuda else "cpu")   
 
@@ -126,6 +123,7 @@ def main():
     print('This data frame has {} rows and {} columns.'.format(df.shape[0], df.shape[1]))
 
     # Downsampling the data
+    
     df_down = resample(df[df['Class']==0], replace=False, n_samples = len(df[df['Class']==1]), random_state = 42)
     balanced_df = pd.concat([df[df['Class']==1],df_down])
     df = shuffle(balanced_df)
@@ -239,7 +237,6 @@ def main():
 
 ######################## Plotting accuracy results ########################
     # plot
-    fig = plt.figure(figsize=(10, 4))
     plt.subplot(121)
     plt.plot(np.arange(1, epochs + 1), A)  # train loss (on epoch end)
     plt.plot(np.arange(1, epochs + 1), C)         #  test loss (on epoch end)
