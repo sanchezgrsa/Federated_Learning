@@ -105,8 +105,8 @@ def validation(model, data_loader, criterion, epoch, device, test):
 def main():
     
     num_classes = 2
-    epochs = 500
-    batch_size = 12
+    epochs = 100
+    batch_size = 64
 
 
     print("[INFO] Starting ...")
