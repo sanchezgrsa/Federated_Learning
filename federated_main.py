@@ -107,8 +107,8 @@ def main():
 
     num_classes = 2
     num_users = 2
-    epochs = 997
-    batch_size = 12
+    epochs = 100
+    batch_size = 64
 
     print("[INFO] Starting ...")
 
