@@ -1,4 +1,4 @@
-# Ntropy Project
+# Federated Learning Approach
 
 ## Prerequisites
     -Python 3.7.4
